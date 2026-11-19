@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TuneFinder — Music Discovery</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Subtle Floating Musical Notes Background -->
+  <div class="music-bg" aria-hidden="true">
+    <span class="note n1">♪</span>
+    <span class="note n2">♫</span>
+    <span class="note n3">♩</span>
+    <span class="note n4">♬</span>
+    <span class="note n5">𝄞</span>
+    <span class="note n6">♪</span>
+    <span class="note n7">♫</span>
+    <span class="note n8">♬</span>
+  </div>
+
+  <div class="container">
+    <!-- Clean Musical Header (No Engine Status Pill) -->
+    <header class="topbar">
+      <div class="brand">
+        <div class="vinyl-disc" aria-hidden="true">
+          <span class="vinyl-center">♪</span>
+        </div>
+        <div>
+          <span class="brand-name">TuneFinder</span>
+          <p class="brand-tag">Identify melodies, lyrics &amp; sound</p>
+        </div>
+      </div>
+
+      <!-- Subtle Animated Musical Equalizer Accent -->
+      <div class="eq-bars" aria-hidden="true" title="Audio Visualizer">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+    </header>
+
+    <!-- Clean Navigation Bar -->
+    <nav class="nav-tabs" role="tablist">
+      <button class="tab-btn active" data-tab="tab-lyrics"><span class="tab-icon">♪</span> Lyrics</button>
+      <button class="tab-btn" data-tab="tab-hum"><span class="tab-icon">♫</span> Hum a Tune</button>
+      <button class="tab-btn" data-tab="tab-audio"><span class="tab-icon">♬</span> Playing Audio</button>
+      <button class="tab-btn" data-tab="tab-recommend"><span class="tab-icon">✦</span> Recommend</button>
+      <button class="tab-btn" data-tab="tab-playlist"><span class="tab-icon">☰</span> Playlist &amp; History</button>
+      <button class="tab-btn" data-tab="tab-ds"><span class="tab-icon">◈</span> DS Info</button>
+    </nav>
+
+    <!-- TAB 1: Lyrics Search -->
+    <section id="tab-lyrics" class="tab-panel active">
+      <div class="card">
+        <h2>♪ Lyrics Search</h2>
+        <p class="subtitle">Type any lyric line or word — live autocomplete suggests matching lyrics as you type.</p>
+        <div class="search-row">
+          <input id="lyrics-query" type="text" class="input" placeholder="e.g. your skin and bones turn into something beautiful" autocomplete="off" />
+          <button id="btn-lyrics-search" class="btn primary">Search</button>
+        </div>
+        <div id="trie-chips" class="chip-row"></div>
+        <div id="trie-meta" class="meta-line"></div>
+      </div>
+      <div id="lyrics-results" class="results-wrap"></div>
+    </section>
+
+    <!-- TAB 2: Hum a Tune -->
+    <section id="tab-hum" class="tab-panel">
+      <div class="card">
+        <h2>♫ Hum or Sing a Tune</h2>
+        <p class="subtitle">Upload a voice note or hum into your mic to match melodies across all 5 full songs.</p>
+
+        <div class="segmented">
+          <button class="seg-btn active" data-hum-mode="upload">Upload File</button>
+          <button class="seg-btn" data-hum-mode="mic">Record Mic</button>
+        </div>
+
+        <div id="hum-upload-box">
+          <label class="dropzone" for="hum-file-input">
+            <span class="drop-note">♬</span>
+            <span id="hum-file-label">Drop or click to choose audio (.ogg, .wav, .mp3, .m4a)</span>
+            <input id="hum-file-input" type="file" accept=".wav,.mp3,.ogg,.flac,.m4a,audio/*" hidden />
+          </label>
+          <button id="btn-hum-upload" class="btn primary full">Identify Melody</button>
+        </div>
+
+        <div id="hum-mic-box" class="hidden">
+          <div class="mic-bar">
+            <button id="btn-mic-start" class="btn accent">Start Recording</button>
+            <button id="btn-mic-stop" class="btn danger" disabled>Stop</button>
+            <div id="mic-wave" class="eq-bars mini paused" aria-hidden="true">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <span id="mic-timer" class="timer">00:00</span>
+          </div>
+          <audio id="mic-preview" controls class="audio-el hidden"></audio>
+          <button id="btn-hum-mic" class="btn primary full" disabled>Identify Recording</button>
+        </div>
+
+        <details class="quiet-details">
+          <summary>Or test with a sample catalog track</summary>
+          <div class="details-body">
+            <select id="hum-sample-select" class="input"></select>
+            <audio id="hum-sample-audio" controls class="audio-el"></audio>
+            <button id="btn-hum-sample" class="btn ghost">Match Sample</button>
+          </div>
+        </details>
+      </div>
+
+      <details id="hum-notes-wrap" class="quiet-details notes-details hidden">
+        <summary id="hum-notes-summary">View extracted MIDI notes</summary>
+        <pre id="hum-notes-code"></pre>
+      </details>
+      <div id="hum-results" class="results-wrap"></div>
+    </section>
+
+    <!-- TAB 3: Playing-Song Audio -->
+    <section id="tab-audio" class="tab-panel">
+      <div class="card">
+        <h2>♬ Playing-Song Audio</h2>
+        <p class="subtitle">Upload a clip of a playing song to match its harmonic chroma and acoustic timbre.</p>
+        <label class="dropzone" for="audio-file-input">
+          <span class="drop-note">♫</span>
+          <span id="audio-file-label">Click to choose an audio clip (.wav, .mp3, .ogg)</span>
+          <input id="audio-file-input" type="file" accept=".wav,.mp3,.ogg,.flac,.m4a,audio/*" hidden />
+        </label>
+        <button id="btn-audio-upload" class="btn primary full">Match Audio</button>
+
+        <details class="quiet-details">
+          <summary>Or test with a sample catalog track</summary>
+          <div class="details-body">
+            <select id="audio-sample-select" class="input"></select>
+            <audio id="audio-sample-audio" controls class="audio-el"></audio>
+            <button id="btn-audio-sample" class="btn ghost">Match Sample</button>
+          </div>
+        </details>
+      </div>
+      <div id="audio-results" class="results-wrap"></div>
+    </section>
+
+    <!-- TAB 4: Recommendations -->
+    <section id="tab-recommend" class="tab-panel">
+      <div class="card">
+        <h2>✦ Song Recommendations</h2>
+        <p class="subtitle">Discover acoustically similar tracks using our Weighted Song Similarity Graph.</p>
+        <div class="inline-row">
+          <select id="rec-song-select" class="input"></select>
+          <select id="rec-mood-select" class="input small-select">
+            <option value="All">All Moods</option>
+          </select>
+          <button id="btn-recommend" class="btn primary">Recommend</button>
+        </div>
+      </div>
+
+      <div id="rec-results" class="results-wrap"></div>
+
+      <details id="rec-graph-wrap" class="quiet-details hidden">
+        <summary>Inspect Weighted Graph Adjacency Edges</summary>
+        <div id="rec-edges-grid" class="edges-list"></div>
+      </details>
+    </section>
+
+    <!-- TAB 5: Playlist & History -->
+    <section id="tab-playlist" class="tab-panel">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h2>♫ Playlist Queue</h2>
+            <p class="subtitle">Doubly Linked List navigation (<code>curr-&gt;prev</code> / <code>curr-&gt;next</code> in O(1))</p>
+          </div>
+          <div class="btn-group">
+            <button id="btn-dll-prev" class="btn ghost">← Prev</button>
+            <button id="btn-dll-next" class="btn primary">Next →</button>
+          </div>
+        </div>
+        <div id="dll-current" class="now-playing">Loading...</div>
+        <div id="dll-visual" class="dll-chain"></div>
+
+        <details class="quiet-details">
+          <summary>Save a custom playlist</summary>
+          <div class="details-body">
+            <div class="inline-row">
+              <input id="pl-name" type="text" class="input" placeholder="Playlist name" />
+              <input id="pl-mood" type="text" class="input small-select" placeholder="Mood" />
+              <button id="btn-pl-save" class="btn accent">Save</button>
+            </div>
+            <div id="pl-checkboxes" class="check-row"></div>
+            <div id="pl-saved-list"></div>
+          </div>
+        </details>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h2>♩ Listening History</h2>
+            <p class="subtitle">LIFO Stack (<code>push</code> / <code>pop</code> in O(1))</p>
+          </div>
+        </div>
+        <div class="inline-row">
+          <select id="stack-song-select" class="input"></select>
+          <button id="btn-stack-push" class="btn primary">Push</button>
+          <button id="btn-stack-pop" class="btn ghost">Pop Top</button>
+        </div>
+        <div id="stack-toast" class="meta-line"></div>
+        <div id="stack-visual" class="stack-list"></div>
+      </div>
+    </section>
+
+    <!-- TAB 6: DS Info & Catalog -->
+    <section id="tab-ds" class="tab-panel">
+      <div class="stats-strip">
+        <div class="stat"><span class="stat-num" id="m-songs">—</span><span class="stat-lbl">Songs</span></div>
+        <div class="stat"><span class="stat-num" id="m-trie">—</span><span class="stat-lbl">Trie Nodes</span></div>
+        <div class="stat"><span class="stat-num" id="m-hash">—</span><span class="stat-lbl">Hash Words</span></div>
+        <div class="stat"><span class="stat-num" id="m-graph">—</span><span class="stat-lbl">Graph Edges</span></div>
+        <div class="stat"><span class="stat-num" id="m-phrases">—</span><span class="stat-lbl">Melody Phrases</span></div>
+      </div>
+
+      <div class="card">
+        <h2>Data Structures Reference (<code>cpp_engine/ds_structures.h</code>)</h2>
+        <div class="table-wrap">
+          <table class="clean-table">
+            <thead>
+              <tr><th>Data Structure</th><th>C++ Class</th><th>Used For</th><th>Complexity</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Prefix Tree (Trie)</td><td><code>LyricTrie</code></td><td>Live lyric autocomplete</td><td>O(L + K)</td></tr>
+              <tr><td>Chaining Hash Table</td><td><code>InvertedIndexHashTable</code></td><td>Inverted lyric word lookup</td><td>O(1) avg</td></tr>
+              <tr><td>Binary Min-Heap</td><td><code>MinHeap&lt;T&gt;</code></td><td>Top-K ranking</td><td>O(N log K)</td></tr>
+              <tr><td>2D DP Matrix</td><td><code>DTWMatcher</code></td><td>Humming melody alignment</td><td>O(n × m)</td></tr>
+              <tr><td>Weighted Graph</td><td><code>SongSimilarityGraph</code></td><td>Song recommendations</td><td>O(V log K)</td></tr>
+              <tr><td>Doubly Linked List</td><td><code>PlaylistDoublyLinkedList</code></td><td>Playlist Next / Prev</td><td>O(1)</td></tr>
+              <tr><td>LIFO Stack</td><td><code>HistoryStack</code></td><td>Listening history</td><td>O(1)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>5-Song Full Catalog</h2>
+        <div id="catalog-table-wrap" class="table-wrap"></div>
+      </div>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# macOS / editors
+.DS_Store
+.vscode/
+.idea/
+
+# Compiled C++ engine (Windows .exe; rebuild on your own machine)
+cpp_engine/ds_engine.exe
+cpp_engine/ds_engine
+*.o
+
+# Generated at runtime (recreated automatically on first run)
+data/music.db
+data/music.db-*
+data/audio_features.pkl
+
+# Secrets
+.env
